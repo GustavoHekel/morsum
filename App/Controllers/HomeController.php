@@ -2,10 +2,12 @@
 
 namespace App\Controllers;
 
+use Core\View;
+
 class HomeController extends Controller
 {
     public function index()
     {
-        echo 'Hello from the index action in the Home controller!';
+        header('Location:/bands/index');
     }
 }
