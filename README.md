@@ -21,6 +21,7 @@
 
 ### Usage
 #### Database
++ There's a script to generate the DB into the `database` folder
 + The DB conection is defined in `App\Config.php` class
 
 DB_HOST = 'my_host'
