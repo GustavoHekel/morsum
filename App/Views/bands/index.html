@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block title %}My Bands{% endblock %}
+{% block panel %}
+    List of Bands
+    <form class="form-inline pull-right" id="new-band">
+        <div class="form-group">
+            <input type="text" class="form-control" name="name" placeholder="Band name">
+            <button class="btn btn-primary">Create new band</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block content %}
+    <table class="table table-hover">
+        <tr>
+            <th>#</th>
+            <th>Band name</th>
+            <th>Actions</th>
+        </tr>
+        {% for band in bands %}
+        <tr>
+            <td>{{ band.id }}</td>
+            <td>{{ band.name }}</td>
+            <td>
+                <div class="btn-group">
+                    <a href="/bands/{{ band.id }}/show" class="btn btn-default">View Albums</a>
+                    <button value="{{ band.id }}" class="btn btn-danger delete">Delete band</button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function(){
+
+        function appendRow(id, text) {
+            $('<tr>')
+            .append($('<td>', {
+                    text: id
+                })
+            )
+            .append($('<td>', {
+                    text: text
+                })
+            )
+            .append($('<td>')
+                .append($('<div>',{
+                        class: 'btn-group'
+                    })
+                    .append($('<a>', {
+                            class: 'btn btn-default',
+                            text: 'View Albums',
+                            href: '/bands/' + id + '/show'
+                        })
+                    )
+                    .append($('<button>', {
+                            value: id,
+                            class: 'btn btn-danger delete',
+                            text: 'Delete band'
+                        })
+                    )
+                )
+            )
+            .appendTo('.table');
+        }
+
+        $('#new-band').submit(function (event){
+            event.preventDefault();
+            var form = $(this).serializeArray();
+
+            if (form[0].value.length == 0) {
+                alert('No name provided');
+                return;
+            }
+
+            $.ajax({
+                method: 'post',
+                url: '/bands/store',
+                data: form,
+                success: function(data) {
+                    appendRow(data, form[0].value);
+                    $('#new-band').trigger('reset');
+                },
+                error: function(data) {
+                    alert('Error')
+                }
+            });
+        });
+
+        $('.panel-body').on('click', '.delete', function(){
+            var row = $(this);
+            $.ajax({
+                method: 'delete',
+                url: '/bands/' + row.val() + '/destroy',
+                success: function(data) {
+                    alert('Band deleted');
+                    row.parents('tr').remove();
+                },
+                error: function() {
+                    alert('Cannot delete band. Delete albums first');
+                }
+            })
+        })
+    });
+</script>
+{% endblock %}

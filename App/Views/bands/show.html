@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block title %}{{ band.name }}{% endblock %}
+{% block panel %}
+    {{ band.name }}
+    <form class="form-inline pull-right" id="new-album">
+        <div class="form-group">
+            <input type="text" class="form-control" name="name" placeholder="Album name">
+            <input type="hidden" value="{{ band.id }}" name="band">
+            <button class="btn btn-primary">Create new album</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block content %}
+    <table class="table table-hover">
+        <tr>
+            <th>#</th>
+            <th>Album name</th>
+            <th>Actions</th>
+        </tr>
+        {% for album in albums %}
+        <tr>
+            <td>{{ album.id }}</td>
+            <td>{{ album.name }}</td>
+            <td>
+                <div class="btn-group">
+                    <button value="{{ album.id }}" class="btn btn-danger">Delete album</button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function(){
+
+        function appendRow(id, text) {
+            $('<tr>')
+            .append($('<td>', {
+                    text: id
+                })
+            )
+            .append($('<td>', {
+                    text: text
+                })
+            )
+            .append($('<td>')
+                .append($('<div>',{
+                        class: 'btn-group'
+                    })
+                    .append($('<button>', {
+                            value: id,
+                            class: 'btn btn-danger delete',
+                            text: 'Delete album'
+                        })
+                    )
+                )
+            )
+            .appendTo('.table');
+        }
+
+        $('#new-album').submit(function (event){
+            event.preventDefault();
+            var form = $(this).serializeArray();
+
+            if (form[0].value.length == 0) {
+                alert('No name provided');
+                return;
+            }
+
+            $.ajax({
+                method: 'post',
+                url: '/albums/store',
+                data: form,
+                success: function(data) {
+                    appendRow(data, form[0].value);
+                    $('#new-album').trigger('reset');
+                },
+                error: function(data) {
+                    alert('Error')
+                }
+            });
+        });
+
+        $('.panel-body').on('click', '.delete', function(){
+            var row = $(this);
+            $.ajax({
+                method: 'delete',
+                url: '/albums/' + row.val() + '/destroy',
+                success: function(data) {
+                    alert('Album deleted');
+                    row.parents('tr').remove();
+                },
+                error: function() {
+                    alert('Cannot delete album. Delete albums first');
+                }
+            })
+        })
+
+    });
+</script>
+{% endblock %}
