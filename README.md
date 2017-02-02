@@ -15,6 +15,7 @@
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
++ Change the ownership of the `logs` for the web server (www-data in apache)
 + Run `sudo a2ensite morsum.conf` or the name of the .conf file
 + Restart apache
 + Go to `local.morsum.com`
