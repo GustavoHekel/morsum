@@ -19,5 +19,5 @@ class Config
     /**
      * Set whether error messages should be shown or logged
      */
-    const SHOW_ERRORS = true;
+    const SHOW_ERRORS = false;
 }
